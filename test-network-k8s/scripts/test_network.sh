@@ -74,16 +74,27 @@ function create_node_local_MSP() {
   export FABRIC_CA_CLIENT_HOME=/var/hyperledger/fabric-ca-client
   export FABRIC_CA_CLIENT_TLS_CERTFILES=/var/hyperledger/fabric/config/tls/ca.crt
 
-  # Enroll from inside the CA pod. Must specify port 443 explicitly.
-  # CA server listens on port 443, but fabric-ca-client defaults to 7054 when port is omitted in the URL.
   fabric-ca-client enroll \
-    --url https://${id_name}:${id_secret}@${ca_name}:443 \
+    --url https://${id_name}:${id_secret}@${ca_name}:${NGINX_HTTPS_PORT} \
     --csr.hosts ${csr_hosts} \
     --mspdir /var/hyperledger/fabric/organizations/${node_type}Organizations/${org}.example.com/${node_type}s/${id_name}.${org}.example.com/msp
 
-  # Copy CA cert to expected filename (fabric-ca-client saves it as <hostname>-<port>.pem)
-  cp /var/hyperledger/fabric/organizations/${node_type}Organizations/${org}.example.com/${node_type}s/${id_name}.${org}.example.com/msp/cacerts/*.pem \
-     /var/hyperledger/fabric/organizations/${node_type}Organizations/${org}.example.com/${node_type}s/${id_name}.${org}.example.com/msp/cacerts/${org}-ca.pem
+  # Rename CA certificate file to match expected name (fabric-ca-client names it with port suffix like org0-ca-443.pem)
+  CACERTS_DIR=/var/hyperledger/fabric/organizations/${node_type}Organizations/${org}.example.com/${node_type}s/${id_name}.${org}.example.com/msp/cacerts
+  if [ ! -f \${CACERTS_DIR}/${org}-ca.pem ]; then
+    # Check for the specific port suffix pattern first
+    if [ -f \${CACERTS_DIR}/${ca_name}-${NGINX_HTTPS_PORT}.pem ]; then
+      mv \${CACERTS_DIR}/${ca_name}-${NGINX_HTTPS_PORT}.pem \${CACERTS_DIR}/${org}-ca.pem
+    else
+      # Fallback: Find and rename any CA cert file with port suffix
+      for cert_file in \${CACERTS_DIR}/${ca_name}*.pem; do
+        if [ -f "\$cert_file" ] && [ "\$(basename \$cert_file)" != "${org}-ca.pem" ]; then
+  	mv "\$cert_file" \${CACERTS_DIR}/${org}-ca.pem
+  	break
+        fi
+      done
+    fi
+  fi
 
   # Create local MSP config.yaml
   echo "NodeOUs:
