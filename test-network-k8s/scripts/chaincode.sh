@@ -6,6 +6,8 @@
 #
 
 # chaincode "group" commands.  Like "main" for chaincode sub-command group.
+CHAINCODE_SEQUENCE=${TEST_NETWORK_CHAINCODE_SEQUENCE:-1}
+
 function chaincode_command_group() {
   #set -x
 
@@ -309,13 +311,12 @@ function launch_chaincode_service() {
 }
 
 function launch_chaincode() {
-  local org=org1
   local cc_name=$1
   local cc_id=$2
   local cc_image=$3
 
-  launch_chaincode_service ${org} peer1 ${cc_name} ${cc_id} ${cc_image}
-  launch_chaincode_service ${org} peer2 ${cc_name} ${cc_id} ${cc_image}
+  launch_chaincode_service org1 peer1 ${cc_name} ${cc_id} ${cc_image}
+  launch_chaincode_service org2 peer1 ${cc_name} ${cc_id} ${cc_image}
 }
 
 function install_chaincode_for() {
@@ -333,22 +334,20 @@ function install_chaincode_for() {
 
 # Package and install the chaincode, but do not activate.
 function install_chaincode() {
-  local org=org1
   local cc_package=$1
 
-  install_chaincode_for ${org} peer1 ${cc_package}
-  install_chaincode_for ${org} peer2 ${cc_package}
+  install_chaincode_for org1 peer1 ${cc_package}
+  install_chaincode_for org2 peer1 ${cc_package}
 }
 
 # approve the chaincode package for an org and assign a name
-function approve_chaincode() {
-  local org=org1
-  local peer=peer1
-  local cc_name=$1
-  local cc_id=$2
-  push_fn "Approving chaincode ${cc_name} with ID ${cc_id}"
+function approve_chaincode_for() {
+  local org=$1
+  local cc_name=$2
+  local cc_id=$3
+  push_fn "Approving chaincode ${cc_name} with ID ${cc_id} for ${org}"
 
-  export_peer_context $org $peer
+  export_peer_context $org peer1
 
   peer lifecycle \
     chaincode approveformyorg \
@@ -356,13 +355,21 @@ function approve_chaincode() {
     --name          ${cc_name} \
     --version       1 \
     --package-id    ${cc_id} \
-    --sequence      1 \
+    --sequence      ${CHAINCODE_SEQUENCE} \
     --orderer       org0-orderer1.${DOMAIN}:${NGINX_HTTPS_PORT} \
     --connTimeout   ${ORDERER_TIMEOUT} \
     --tls --cafile  ${TEMP_DIR}/channel-msp/ordererOrganizations/org0/orderers/org0-orderer1/tls/signcerts/tls-cert.pem \
     ${APPROVE_EXTRA_ARGS}
 
   pop_fn
+}
+
+function approve_chaincode() {
+  local cc_name=$1
+  local cc_id=$2
+
+  approve_chaincode_for org1 ${cc_name} ${cc_id}
+  approve_chaincode_for org2 ${cc_name} ${cc_id}
 }
 
 # commit the named chaincode for an org
@@ -379,7 +386,7 @@ function commit_chaincode() {
     --channelID     ${CHANNEL_NAME} \
     --name          ${cc_name} \
     --version       1 \
-    --sequence      1 \
+    --sequence      ${CHAINCODE_SEQUENCE} \
     --orderer       org0-orderer1.${DOMAIN}:${NGINX_HTTPS_PORT} \
     --connTimeout   ${ORDERER_TIMEOUT} \
     --tls --cafile  ${TEMP_DIR}/channel-msp/ordererOrganizations/org0/orderers/org0-orderer1/tls/signcerts/tls-cert.pem \
