@@ -113,7 +113,9 @@ spec:
             name: org2-config
         - name: tls-cert-volume
           secret:
-            secretName: org2-peer1-tls-cert          
+            secretName: org2-peer1-tls-cert
+      nodeSelector:
+        nodeType: org2
 ---
 apiVersion: v1
 kind: Service

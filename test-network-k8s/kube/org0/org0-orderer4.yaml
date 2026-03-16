@@ -101,6 +101,8 @@ spec:
         - name: tls-cert-volume
           secret:
             secretName: org0-orderer4-tls-cert
+      nodeSelector:
+        nodeType: org0
 ---
 apiVersion: v1
 kind: Service

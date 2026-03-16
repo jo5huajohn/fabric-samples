@@ -82,6 +82,8 @@ spec:
         - name: tls-cert-volume
           secret:
             secretName: org0-ca-tls-cert
+      nodeSelector:
+        nodeType: org0
 
 ---
 apiVersion: v1
