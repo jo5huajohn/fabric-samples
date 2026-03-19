@@ -11,7 +11,19 @@ metadata:
 spec:
   accessModes:
     - ReadWriteOnce
-  storageClassName: ${STORAGE_CLASS}
+  storageClassName: local-org2
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: couchdb-org2-peer1
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-org2-couchdb
   resources:
     requests:
       storage: 1Gi
