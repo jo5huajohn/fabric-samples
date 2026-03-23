@@ -44,6 +44,8 @@ data:
   CORE_PEER_LISTENADDRESS: 0.0.0.0:7051
   CORE_PEER_CHAINCODEADDRESS: org1-peer1:7052
   CORE_PEER_CHAINCODELISTENADDRESS: 0.0.0.0:7052
+  CORE_PEER_GATEWAY_BROADCASTTIMEOUT: "600s"
+  CORE_PEER_GATEWAY_ENDORSEMENTTIMEOUT: "60s"
   # bootstrap peer is the other peer in the same org
   CORE_PEER_GOSSIP_BOOTSTRAP: org1-peer2:7051
   CORE_PEER_GOSSIP_EXTERNALENDPOINT: org1-peer1.${ORG1_NS}.svc.cluster.local:7051
@@ -87,13 +89,23 @@ spec:
             - containerPort: 7052
             - containerPort: 9443
           volumeMounts:
-            - name: fabric-volume
+            - name: fabric-org1-peer1-volume
               mountPath: /var/hyperledger
+            - name: fabric-ca-volume
+              mountPath: /var/hyperledger/fabric/organizations
+              subPath: fabric/organizations
             - name: fabric-config
               mountPath: /var/hyperledger/fabric/config
             - name: tls-cert-volume
               mountPath: /var/hyperledger/fabric/config/tls
               readOnly: true
+          resources:
+            requests:
+              cpu: "8"
+              memory: "8Gi"
+            limits:
+              cpu: "8"
+              memory: "8Gi"
         - name: couchdb
           image: couchdb:${COUCHDB_VERSION}
           imagePullPolicy: IfNotPresent
@@ -104,10 +116,26 @@ spec:
               value: "adminpw"
           ports:
               - containerPort: 5984
+          volumeMounts:
+            - name: couchdb-org1-peer1-volume
+              mountPath: /opt/couchdb/data
+          resources:
+            requests:
+              cpu: "4"
+              memory: "4Gi"
+            limits:
+              cpu: "4"
+              memory: "4Gi"
       volumes:
-        - name: fabric-volume
+        - name: fabric-org1-peer1-volume
           persistentVolumeClaim:
-            claimName: fabric-org1
+            claimName: fabric-org1-peer1
+        - name: fabric-ca-volume
+          persistentVolumeClaim:
+            claimName: fabric-org1-ca
+        - name: couchdb-org1-peer1-volume
+          persistentVolumeClaim:
+            claimName: couchdb-org1-peer1
         - name: fabric-config
           configMap:
             name: org1-config

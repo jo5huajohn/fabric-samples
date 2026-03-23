@@ -7,11 +7,35 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: fabric-org2
+  name: fabric-org2-ca
 spec:
   accessModes:
     - ReadWriteOnce
-  storageClassName: local-org2
+  storageClassName: local-org2-ca
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: fabric-org2-peer1
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-org2-peer1
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: fabric-org2-peer2
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-org2-peer2
   resources:
     requests:
       storage: 1Gi
@@ -23,7 +47,19 @@ metadata:
 spec:
   accessModes:
     - ReadWriteOnce
-  storageClassName: local-org2-couchdb
+  storageClassName: local-org2-peer1-couchdb
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: couchdb-org2-peer2
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-org2-peer2-couchdb
   resources:
     requests:
       storage: 1Gi

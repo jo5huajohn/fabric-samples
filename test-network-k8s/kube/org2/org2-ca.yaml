@@ -75,7 +75,7 @@ spec:
       volumes:
         - name: fabric-volume
           persistentVolumeClaim:
-            claimName: fabric-org2
+            claimName: fabric-org2-ca
         - name: fabric-config
           configMap:
             name: org2-config
@@ -123,4 +123,4 @@ spec:
   tls:
     - hosts:
         - org2-ca.${DOMAIN}
-    
+ 

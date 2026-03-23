@@ -24,11 +24,21 @@ spec:
           command:
             - sh
             - -c
-            - "mkdir -p /mnt/fabric-org1/fabric/external_builders && cp -rv /opt/hyperledger/k8s_builder /mnt/fabric-org1/fabric/external_builders/"
+            - |
+              mkdir -p /mnt/fabric-org1-peer1/fabric/external_builders && \
+              cp -rv /opt/hyperledger/k8s_builder /mnt/fabric-org1-peer1/fabric/external_builders/
+              mkdir -p /mnt/fabric-org1-peer2/fabric/external_builders && \
+              cp -rv /opt/hyperledger/k8s_builder /mnt/fabric-org1-peer2/fabric/external_builders/
           volumeMounts:
-            - name: fabric-org1-volume
-              mountPath: /mnt/fabric-org1
+            - name: fabric-org1-peer1-volume
+              mountPath: /mnt/fabric-org1-peer1
+            - name: fabric-org1-peer2-volume
+              mountPath: /mnt/fabric-org1-peer2
       volumes:
-        - name: fabric-org1-volume
+        - name: fabric-org1-peer1-volume
           persistentVolumeClaim:
-            claimName: fabric-org1
+            claimName: fabric-org1-peer1
+        - name: fabric-org1-peer2-volume
+          persistentVolumeClaim:
+            claimName: fabric-org1-peer2
+

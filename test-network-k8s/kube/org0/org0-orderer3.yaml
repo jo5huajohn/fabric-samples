@@ -86,6 +86,9 @@ spec:
           volumeMounts:
             - name: fabric-volume
               mountPath: /var/hyperledger
+            - name: fabric-ca-volume
+              mountPath: /var/hyperledger/fabric/organizations
+              subPath: fabric/organizations
             - name: fabric-config
               mountPath: /var/hyperledger/fabric/config
             - name: tls-cert-volume
@@ -94,7 +97,10 @@ spec:
       volumes:
         - name: fabric-volume
           persistentVolumeClaim:
-            claimName: fabric-org0
+            claimName: fabric-org0-o3
+        - name: fabric-ca-volume
+          persistentVolumeClaim:
+            claimName: fabric-org0-ca
         - name: fabric-config
           configMap:
             name: org0-config

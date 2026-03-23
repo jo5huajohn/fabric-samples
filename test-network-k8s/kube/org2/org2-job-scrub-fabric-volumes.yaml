@@ -24,10 +24,30 @@ spec:
             - -c
             - "rm -rvf /mnt/fabric-*/*"
           volumeMounts:
-            - name: fabric-org2-volume
-              mountPath: /mnt/fabric-org2
+            - name: fabric-org2-ca-volume
+              mountPath: /mnt/fabric-org2-ca
+            - name: fabric-org2-peer1-volume
+              mountPath: /mnt/fabric-org2-peer1
+            - name: fabric-org2-peer2-volume
+              mountPath: /mnt/fabric-org2-peer2
+            - name: couchdb-org2-peer1-volume
+              mountPath: /mnt/fabric-couchdb-org2-peer1
+            - name: couchdb-org2-peer2-volume
+              mountPath: /mnt/fabric-couchdb-org2-peer2
       volumes:
-        - name: fabric-org2-volume
+        - name: fabric-org2-ca-volume
           persistentVolumeClaim:
-            claimName: fabric-org2
+            claimName: fabric-org2-ca
+        - name: fabric-org2-peer1-volume
+          persistentVolumeClaim:
+            claimName: fabric-org2-peer1
+        - name: fabric-org2-peer2-volume
+          persistentVolumeClaim:
+            claimName: fabric-org2-peer2
+        - name: couchdb-org2-peer1-volume
+          persistentVolumeClaim:
+            claimName: couchdb-org2-peer1
+        - name: couchdb-org2-peer2-volume
+          persistentVolumeClaim:
+            claimName: couchdb-org2-peer2
 
